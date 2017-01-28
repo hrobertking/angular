@@ -62,8 +62,14 @@ angular.module('prototype', [ ])
             /**
              * default values
              */
-            scope.value = scope.value || (new Date()).getTime();
-            scope.renderDate = new Date((new Date(scope.value)).getFullYear(), (new Date(scope.value)).getMonth(), 1);
+            scope.values = [ ];
+
+            scope.renderDate = scope.renderDate || new Date();
+            if (!(scope.renderDate instanceof Date)) {
+                scope.renderDate = new Date(scope.renderDate);
+            }
+            scope.renderDate.setDate(1);
+
             scope.month = scope.renderDate.getMonth();
             scope.year = scope.renderDate.getFullYear();
 
@@ -145,23 +151,9 @@ angular.module('prototype', [ ])
              * event handlers
              */
             scope.onclick = function(evt) {
-                var cell = (evt || window.event).target || (evt || window.event).srcElement,
-                    ds = cell.getAttribute('aria-label'),
-                    dt = new Date(ds),
-                    selected = /\bselected\b/,
-                    is_selected = selected.test(cell.className),
-                    dx;
+                var cell = (evt || window.event).target || (evt || window.event).srcElement;
 
-                /**
-                 * this assumes there is only one date value selected at a time
-                 * if it is a range, the markup will have to be structured differently
-                 * and the addition/removal of the 'selected' class will have to be different
-                 */
-                dt = new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000));
-                if (!isNaN(dt.getTime())) {
-                    scope.value = dt.getTime();
-                }
-                markSelected();
+                toggle(cell);
             };
 
             /**
@@ -172,12 +164,7 @@ angular.module('prototype', [ ])
                     row = cell.parentNode,
                     tbody = row.parentNode,
                     table = tbody.parentNode,
-                    key = (evt || window.event).keyCode,
-                    ds = cell.getAttribute('aria-label'),
-                    dt = new Date(ds),
-                    selected = /\bselected\b/,
-                    is_selected = selected.test(cell.className),
-                    dx;
+                    key = (evt || window.event).keyCode;
 
                 /**
                  * if the key is a directional key, move, otherwise select/unselect the date
@@ -222,11 +209,7 @@ angular.module('prototype', [ ])
                     case 9: /* tab */
                         break;
                     default:
-                        dt = new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000));
-                        if (!isNaN(dt.getTime())) {
-                            scope.value = dt.getTime();
-                        }
-                        markSelected();
+                        toggle(cell);
                         break;
                 }
             };
@@ -258,15 +241,15 @@ angular.module('prototype', [ ])
             }
             setDayColumns();
 
-		/**
-		 * watch for changes in localization
-		 */
+            /**
+             * watch for changes in localization
+             */
             scope.$watch('days', setDayNames, true);
             scope.$watch('startOn', setDayNames, true);
 
-		/**
-		 * watch for changes of the month or year
-		 */
+            /**
+             * watch for changes of the month or year
+             */
             scope.$watch('year', setRenderDate, true);
             scope.$watch('month', setRenderDate, true);
 
@@ -330,16 +313,17 @@ angular.module('prototype', [ ])
                 setDayNames();
             }
             function isSelected(dt) {
-                var val = new Date(scope.value);
-
-                dt = new Date(dt);
+                var val,
+                    ndx;
 
                 /**
-                 * add the timezone offset for comparison
+                 * make sure we're evaluating a date
                  */
-                dt = new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000));
+                if (!(dt instanceof Date)) {
+                    dt = new Date(dt);
+                }
 
-                return (val.getFullYear() === dt.getFullYear() && val.getMonth() === dt.getMonth() && val.getDate() === dt.getDate());
+                return (scope.values.findByValue(dt) > -1);
             }
             function markSelected() {
                 var ndx = scope.dayCells.length - 1;
@@ -372,35 +356,105 @@ angular.module('prototype', [ ])
                 scope.nextYearLabel = scope.year + 1;
                 scope.previousYearLabel = scope.year - 1;
                 scope.render();
-            };
+            }
+            function toggle(cell) {
+                var ds = cell.getAttribute('aria-label'),
+                    dt = new Date(ds),
+                    selected = /\bselected\b/,
+                    is_selected = selected.test(cell.className);
 
-		/**
-		 * set up a method to calculate the week
-		 * in case we need it
-		 */
-		if (!(new Date()).getWeek) {
-			Date.prototype.getWeek = function() {
-				var dt = new Date(this.getTime()),
-					j1 = new Date(dt.getFullYear(), 0, 1)
-					ms = 7 * 24 * 60 * 60 * 1000,
-					wk = 0;
+                dt = new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000));
+                if (!isNaN(dt.getTime())) {
+                    if (is_selected) {
+                        cell.className = cell.className.replace(selected, '');
+                        scope.values.remove(dt);
+                    } else {
+                        cell.className += ' selected';
+                        cell.className = cell.className.replace(/^\s*|\s*$/g, '');
+                        scope.values.push(dt);
+                    }
+                }
+            }
 
-				/**
-				 * if the year starts on Thursday or before,
-				 * the calculation is a straight subtract and divide
-				 * but if it's not we have to determine if we're really
-				 * looking at the 53rd week of last year
-				 */
-				if (j1.getDay() > 4) {
-					if (dt.getDate() > 3) {
-						j1.setDate(j1.getDate() + 4 - (j1.getDay() - 4));
-					} else {
-						j1 = new Date(j1.getFullYear() - 1, 0, 1);
-					}
-				}
-				return Math.floor((dt.getTime() - j1.getTime()) / ms) + 1;
-			};
-		}
+            /**
+             * set up a method to find by value
+             */
+            if (!scope.values.findByValue) {
+                scope.values.findByValue = function(value) {
+                    var ndx = this.length - 1,
+                        val;
+
+                    if (!(value instanceof Date)) {
+                        value = new Date(value);
+                    }
+                    value = new Date(value.getTime() + (value.getTimezoneOffset() * 60000));
+
+                    while (ndx > -1) {
+                        val = this[ndx];
+                        if (value.getFullYear() === val.getFullYear() &&
+                            value.getMonth() === val.getMonth() &&
+                            value.getDate() === val.getDate()) {
+                            return ndx;
+                        }
+                        ndx -= 1;
+                    }
+                    return ndx;
+                };
+            }
+            /**
+             * set up a method to remove an array element by value
+             */
+            if (!scope.values.remove) {
+                scope.values.remove = function(value) {
+                   var ndx = this.length - 1,
+                       val;
+
+                   /**
+                    * looping backwards is more than a faster performer
+                    * it's used here to make sure we don't skip values or
+                    * accidently delete something we don't want to delete
+                    */
+                   if (!(value instanceof Date)) {
+                       value = new Date(value);
+                   }
+                   value = value.getTime();
+
+                   while (ndx > -1) {
+                       val = this[ndx].getTime();
+                       if (val == value) {
+                           this.splice(ndx, 1);
+                       }
+                       ndx -= 1;
+                   }
+                   return ndx;
+                };
+            }
+            /**
+             * set up a method to calculate the week in case we need it
+             */
+            if (!(new Date()).getWeek) {
+                Date.prototype.getWeek = function() {
+                    var dt = new Date(this.getTime()),
+                        j1 = new Date(dt.getFullYear(), 0, 1)
+                        ms = 7 * 24 * 60 * 60 * 1000,
+                        wk = 0;
+
+                    /**
+                     * if the year starts on Thursday or before,
+                     * the calculation is a straight subtract and divide
+                     * but if it's not we have to determine if we're really
+                     * looking at the 53rd week of last year
+                     */
+                    if (j1.getDay() > 4) {
+                        if (dt.getDate() > 3) {
+                            j1.setDate(j1.getDate() + 4 - (j1.getDay() - 4));
+                        } else {
+                            j1 = new Date(j1.getFullYear() - 1, 0, 1);
+                        }
+                    }
+                    return Math.floor((dt.getTime() - j1.getTime()) / ms) + 1;
+                };
+            }
 
             $timeout(function() {
                 init();
