@@ -1,15 +1,111 @@
 angular.module('prototype', [ ])
-.directive('calendar', ['$filter', '$timeout', function($filter, $timeout) {
-    var link = function(scope, element, attrs, ctrl) {
+.directive('calendar', ['$filter', '$timeout', '$compile', function($filter, $timeout, $compile) {
+    var html = '<table class="calendar" id="{{id}}-calendar-interface">' +
+               '<thead>' +
+               '<tr class="control">' +
+               '<th colspan="7">' +
+               '<fieldset>' +
+               '<legend>Month</legend>' +
+               '<button aria-label="{{previousMonthLabel}}" type="button" ng-click="prevMonth()">&lt;</button>' +
+               '<select aria-label="" class="month" ng-model="month" ng-options="months.indexOf(month) as month for month in months"></select>' +
+               '<button aria-label="{{nextMonthLabel}}" type="button" ng-click="nextMonth()">&gt;</button>' +
+               '</fieldset>' +
+               '<fieldset>' +
+               '<legend>Year</legend>' +
+               '<button aria-label="{{previousYearLabel}}" type="button" ng-click="prevYear()">&lt;</button>' +
+               '<select aria-label="" class="year" ng-model="year" ng-options="(years.indexOf(year) + start_year) as year for year in years"></select>' +
+               '<button aria-label="{{nextYearLabel}}" type="button" ng-click="nextYear()">&gt;</button>' +
+               '</fieldset>' +
+               '</th>' +
+               '</tr>' +
+               '<tr class="days" id="day_names">' +
+               '<th scope="col" ng-repeat="dayColumn in dayColumns">{{dayColumn}}</th>' +
+               '</tr>' +
+               '</thead>' +
+               '<tbody id="{{id}}-calendar-interface-days">' +
+               '<tr>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '</tr>' +
+               '<tr>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '</tr>' +
+               '<tr>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '</tr>' +
+               '<tr>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '</tr>' +
+               '<tr>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '</tr>' +
+               '<tr>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '</tr>' +
+               '</tbody>' +
+               '</table>',
+        link = function(scope, element, attrs, ctrl) {
             var ndx;
 
             /**
-             * configuration: date format
+             * Date format
+             *
+             * @type {string}
+             * @see https://docs.angularjs.org/api/ng/filter/date
              */
             scope.dateformat = scope.dateformat || attrs.dateformat || 'yyyy-MM-dd';
 
             /**
-             * configuration: days for the column headers
+             * The day of the week that starts the week. This is a value tied to
+             * scope.days, i.e., the index given will start on that day, e.g.,
+             * with defaults, a value of 0 will start on Sunday and a value of 1
+             * will start on Monday.
+             *
+             * @type {integer}
+             */
+            scope.startOn = scope.startOn || 0;
+
+            /**
+             * Abbreviated day names for the column headers, e.g., 'Sun', 'Mon'
+             * 'Fri', 'Sat'. Sunday must be the first element and Saturday the
+             * last.
+             *
+             * @type {string[]}
              */
             scope.days = [
                     $filter('date')(new Date(1970, 0, 4), 'EEE'),
@@ -22,7 +118,10 @@ angular.module('prototype', [ ])
                 ];
 
             /**
-             * configuration: months for the drop down
+             * Month names for the 'months' drop down list. January is the first
+             * element and December is the last.
+             *
+             * @type {string[]}
              */
             scope.months = scope.months || attrs.months || [ ];
             if (!(scope.months instanceof Array) || scope.months.length < 12) {
@@ -43,12 +142,10 @@ angular.module('prototype', [ ])
             }
 
             /**
-             * configuration: day of the week to start the calendar on -- 0 = sunday, 6 = saturday
-             */
-            scope.startOn = scope.startOn || 0;
-
-            /**
-             * configuration: years for the drop down
+             * The years array for the 'years' drop down list. Defaults to the current
+             * year minus 10 through the current year plus 10.
+             *
+             * @type {integer[]}
              */
             if (!scope.years || !(scope.years instanceof Array)) {
                 scope.years = [ ];
@@ -60,21 +157,10 @@ angular.module('prototype', [ ])
             }
 
             /**
-             * default values
-             */
-            scope.values = [ ];
-
-            scope.renderDate = scope.renderDate || new Date();
-            if (!(scope.renderDate instanceof Date)) {
-                scope.renderDate = new Date(scope.renderDate);
-            }
-            scope.renderDate.setDate(1);
-
-            scope.month = scope.renderDate.getMonth();
-            scope.year = scope.renderDate.getFullYear();
-
-            /**
-             * parses a date input
+             * Parses a date input using the defined dateformat
+             *
+             * @returns void
+             * @param {string} value
              */
             scope.parseDate = function(value) {
                 var filter = (scope.dateformat || '')
@@ -142,22 +228,29 @@ angular.module('prototype', [ ])
                 if (!isNaN(dt) && dt instanceof Date) {
                     dt = new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000));
                     if (!isNaN(dt.getTime())) {
-                        scope.value = dt.getTime();
+                        scope.value = $filter('date')(dt, scope.dateformat);
                     }
                 }
             };
 
             /**
-             * event handlers
+             * Handles the click event on a calendar table cell.
+             *
+             * @returns void
+             * @param {event} evt
              */
             scope.onclick = function(evt) {
                 var cell = (evt || window.event).target || (evt || window.event).srcElement;
-
-                toggle(cell);
+                
+                setValue(cell);
             };
 
             /**
-             * this must be bound to keydown, because some UA do not pass directional keys in keypress or keyup
+             * Handles the keypress event on a calendar table cell. The event handler must be
+             * bound to keydown, because some UA do not pass directional keys in keypress or keyup.
+             *
+             * @returns void
+             * @param {event} evt
              */
             scope.onkeydown = function(evt) {
                 var cell = (evt || window.event).target || (evt || window.event).srcElement,
@@ -209,72 +302,93 @@ angular.module('prototype', [ ])
                     case 9: /* tab */
                         break;
                     default:
-                        toggle(cell);
+                        setValue(cell);
                         break;
                 }
             };
 
+            /**
+             * Increments the month
+             *
+             * @returns void
+             */
             scope.nextMonth = function() {
-                scope.month += (scope.month === 11 ? -11 : 1);
+                if (scope.month === 11) {
+                    scope.year += 1;
+                    scope.month = 0;
+                } else {
+                    scope.month += 1;
+                }
             };
+
+            /**
+             * Increments the year
+             *
+             * @returns void
+             */
             scope.nextYear = function() {
                 scope.year += 1;
             };
+
+            /**
+             * Decrements the month
+             *
+             * @returns void
+             */
             scope.prevMonth = function() {
-                scope.month += (scope.month === 0 ? 11 : -1);
-            };
-            scope.prevYear = function() {
-                scope.year += -1;
-            };
-
-            /**
-             * intialize the day header
-             */
-            scope.dayColumns = [ ];
-            function setDayColumns() {
-                scope.dayColumns = [ ];
-                for (ndx = 0; ndx < scope.days.length; ndx += 1) {
-                    scope.dayColumns.push(scope.days[ (ndx + (scope.startOn % 7)) < scope.days.length ?
-                                           (ndx + (scope.startOn % 7)) :
-                                           ((ndx + (scope.startOn % 7)) - scope.days.length) ]);
+                if (scope.month === 0) {
+                    scope.year -= 1;
+                    scope.month = 11;
+                } else {
+                    scope.month -= -1;
                 }
-            }
-            setDayColumns();
+            };
 
             /**
-             * watch for changes in localization
+             * Decrements the year
+             *
+             * @returns void
              */
-            scope.$watch('days', setDayNames, true);
-            scope.$watch('startOn', setDayNames, true);
+            scope.prevYear = function() {
+                scope.year -= 1;
+            };
 
             /**
-             * watch for changes of the month or year
-             */
-            scope.$watch('year', setRenderDate, true);
-            scope.$watch('month', setRenderDate, true);
-
-            /**
-             * bind to the element
-             */
-            scope.input = element[0];
-            scope.id = scope.input.nodeName.toLowerCase() === 'calendar' ? scope.input.getAttribute('bind') : scope.input.id;
-
-            /**
-             * calendar dates as a node list
+             * The table cells that represent the calendar dates.
+             *
+             * @type {NodeList}
              */
             scope.dayCells = null;
 
+            /**
+             * The day names used in the calendar header.
+             *
+             * @type {string[]}
+             */
+            scope.dayColumns = [ ];
+
+            /**
+             * The ID of the input element we will bind to.
+             *
+             * @type {string}
+             */
+            scope.id = attrs.bind || attrs.id;
+
+            /**
+             * Method used to render the calendar table
+             *
+             * @returns void
+             */
             scope.render = function() {
                 var MS_PER_DAY = 24 * 60 * 60 * 1000,
                     idx,
                     today = new Date(),
-                    iso = /^(\d{4}\D\d{2}\D\d{2})/,
                     dx = scope.renderDate;
 
                 /**
-                 * check to make sure the calendar is rendered
+                 * check to make sure the calendar container is rendered
                  */
-                if (!scope.dayCells) { init(); }
+                if (!scope.dayCells) { return; }
 
                 /**
                  * loop through days and set the table cell values, including aria-label
@@ -282,52 +396,43 @@ angular.module('prototype', [ ])
                 dx = new Date(dx.getTime() - (((scope.startOn % 7) ? (dx.getDay() + (7 - (scope.startOn % 7))) : dx.getDay()) * MS_PER_DAY));
                 idx = 0;
                 while (idx < scope.dayCells.length) {
-                    scope.dayCells.item(idx).setAttribute('aria-label', iso.exec(dx.toISOString())[1]);
+                    scope.dayCells.item(idx).setAttribute('aria-label', dx.getFullYear() + '-' + ('0' + (dx.getMonth() + 1)).substr(-2) + '-' + ('0' + dx.getDate()).substr(-2));
                     scope.dayCells.item(idx).className = [scope.dayCells.item(idx).className.replace(/\b(before|after|today|selected)\b/g, ''),
                             (idx < scope.renderDate.getDay() && dx.getMonth() < scope.renderDate.getMonth() ? 'before' : ''),
                             (dx.getMonth() > scope.renderDate.getMonth() || dx.getFullYear() > scope.renderDate.getFullYear() ? 'after' : ''),
                             (dx.getFullYear() === today.getFullYear() && dx.getMonth() === today.getMonth() && dx.getDate() === today.getDate() ? 'today' : '')
                         ].join(' ').replace(/\s{2,}/g, ' ').replace(/^\s*|\s*$/g, '');
 
+                    markSelected();
+
                     scope.dayCells.item(idx).innerHTML = dx.getDate();
                     dx = new Date(dx.getTime() + MS_PER_DAY);
                     idx += 1;
                 }
-
-                markSelected();
             };
 
-            function init() {
-                var dates = document.getElementById(scope.id + '-calendar-interface-days');
-
-                /**
-                 * make sure the input has the 'calendar' attribute even if the directive is called as an element
-                 */
-                scope.input = document.getElementById(scope.id);
-                scope.input.setAttribute('calendar', 'true');
-
-                /**
-                 * initialize the dayCells property so we can render the calendar days
-                 */
-                scope.dayCells = dates ? dates.getElementsByTagName('td') : [ ];
-                setDayNames();
-            }
+            /**
+             * Returns true if the value provided is the value selected
+             *
+             * @returns {boolean}
+             * @private
+             * @param {string|date} dt
+             */
             function isSelected(dt) {
-                var val,
-                    ndx;
+                var val = new Date(scope.value);
+                dt = new Date(dt);
 
-                /**
-                 * make sure we're evaluating a date
-                 */
-                if (!(dt instanceof Date)) {
-                    dt = new Date(dt);
-                }
-
-                return (scope.values.findByValue(dt) > -1);
+                return (val.getFullYear() === dt.getFullYear() && val.getMonth() === dt.getMonth() && val.getDate() === dt.getDate());
             }
-            function markSelected() {
-                var ndx = scope.dayCells.length - 1;
 
+            /**
+             * Loops through day cells and adds 'selected' to the class list if the date is selected.
+             *
+             * @returns void
+             * @private
+             */
+            function markSelected() {
+                ndx = scope.dayCells.length - 1;
                 while (ndx > -1) {
                     scope.dayCells.item(ndx).className = [
                             (scope.dayCells.item(ndx).className.replace(/\bselected\b/, '')),
@@ -336,19 +441,28 @@ angular.module('prototype', [ ])
                     ndx -= 1;
                 }
             }
-            function setDayNames() {
-                var nodes = document.getElementById(scope.id + '-calendar-interface-day-names'),
-                    ndx;
 
-                nodes = nodes ? nodes.getElementsByTagName('th') : [ ];
-                if (nodes.length >= scope.days.length) {
-                    for (ndx = 0; ndx < scope.days.length; ndx += 1) {
-                        nodes.item(ndx).innerHTML = scope.days[ (ndx + (scope.startOn % 7)) < scope.days.length ?
-                                               (ndx + (scope.startOn % 7)) :
-                                               ((ndx + (scope.startOn % 7)) - scope.days.length) ];
-                    }
+            /**
+             * Sets the string array used as day column headers using the 'days' and 'startOn' properties.
+             *
+             * @returns void
+             * @private
+             */
+            function setDayColumns() {
+                scope.dayColumns = [ ];
+                for (ndx = 0; ndx < scope.days.length; ndx += 1) {
+                    scope.dayColumns.push(scope.days[ (ndx + (scope.startOn % 7)) < scope.days.length ?
+                                           (ndx + (scope.startOn % 7)) :
+                                           ((ndx + (scope.startOn % 7)) - scope.days.length) ]);
                 }
             }
+
+            /**
+             * Sets the value of the render date given the month and year before updating the related labels.
+             *
+             * @returns void
+             * @private
+             */
             function setRenderDate() {
                 scope.renderDate = new Date(scope.year, scope.month, 1);
                 scope.nextMonthLabel = scope.months[scope.month === 11 ? 0 : scope.month + 1];
@@ -357,221 +471,101 @@ angular.module('prototype', [ ])
                 scope.previousYearLabel = scope.year - 1;
                 scope.render();
             }
-            function toggle(cell) {
+
+            /**
+             * Sets the 'value' using the provided calendar cell and calls the method to add/remove the
+             * 'selected' class from calendar cells.
+             *
+             * @returns void
+             */
+            function setValue(cell) {
                 var ds = cell.getAttribute('aria-label'),
-                    dt = new Date(ds),
-                    selected = /\bselected\b/,
-                    is_selected = selected.test(cell.className);
+                    dt = new Date(ds);
 
-                dt = new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000));
-                if (!isNaN(dt.getTime())) {
-                    if (is_selected) {
-                        cell.className = cell.className.replace(selected, '');
-                        scope.values.remove(dt);
-                    } else {
-                        cell.className += ' selected';
-                        cell.className = cell.className.replace(/^\s*|\s*$/g, '');
-                        scope.values.push(dt);
-                    }
+                /**
+                 * this assumes there is only one date value selected at a time
+                 * if it is a range, the markup will have to be structured differently
+                 * and the addition/removal of the 'selected' class will have to be different
+                 */
+                if (!isNaN(dt)) {
+                    scope.value = $filter('date')(new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000)), scope.dateformat);
                 }
+                markSelected();
             }
 
             /**
-             * set up a method to find by value
+             * Initializes the calendar
              */
-            if (!scope.values.findByValue) {
-                scope.values.findByValue = function(value) {
-                    var ndx = this.length - 1,
-                        val;
-
-                    if (!(value instanceof Date)) {
-                        value = new Date(value);
-                    }
-                    value = new Date(value.getTime() + (value.getTimezoneOffset() * 60000));
-
-                    while (ndx > -1) {
-                        val = this[ndx];
-                        if (value.getFullYear() === val.getFullYear() &&
-                            value.getMonth() === val.getMonth() &&
-                            value.getDate() === val.getDate()) {
-                            return ndx;
-                        }
-                        ndx -= 1;
-                    }
-                    return ndx;
-                };
-            }
-            /**
-             * set up a method to remove an array element by value
-             */
-            if (!scope.values.remove) {
-                scope.values.remove = function(value) {
-                   var ndx = this.length - 1,
-                       val;
-
-                   /**
-                    * looping backwards is more than a faster performer
-                    * it's used here to make sure we don't skip values or
-                    * accidently delete something we don't want to delete
-                    */
-                   if (!(value instanceof Date)) {
-                       value = new Date(value);
-                   }
-                   value = value.getTime();
-
-                   while (ndx > -1) {
-                       val = this[ndx].getTime();
-                       if (val == value) {
-                           this.splice(ndx, 1);
-                       }
-                       ndx -= 1;
-                   }
-                   return ndx;
-                };
-            }
-            /**
-             * set up a method to calculate the week in case we need it
-             */
-            if (!(new Date()).getWeek) {
-                Date.prototype.getWeek = function() {
-                    var dt = new Date(this.getTime()),
-                        j1 = new Date(dt.getFullYear(), 0, 1)
-                        ms = 7 * 24 * 60 * 60 * 1000,
-                        wk = 0;
-
-                    /**
-                     * if the year starts on Thursday or before,
-                     * the calculation is a straight subtract and divide
-                     * but if it's not we have to determine if we're really
-                     * looking at the 53rd week of last year
-                     */
-                    if (j1.getDay() > 4) {
-                        if (dt.getDate() > 3) {
-                            j1.setDate(j1.getDate() + 4 - (j1.getDay() - 4));
-                        } else {
-                            j1 = new Date(j1.getFullYear() - 1, 0, 1);
-                        }
-                    }
-                    return Math.floor((dt.getTime() - j1.getTime()) / ms) + 1;
-                };
-            }
-
             $timeout(function() {
-                init();
+                var dates;
+
+                /**
+                 * set the day columns
+                 */
+                setDayColumns();
+
+                /**
+                 * create the monitors for localization changes
+                 */
+                scope.$watch('days', setDayColumns, true);
+                scope.$watch('startOn', setDayColumns, true);
+
+                /**
+                 * create the monitors for year and month rendering changes
+                 */
+                scope.$watch('year', setRenderDate, true);
+                scope.$watch('month', setRenderDate, true);
+
+                /**
+                 * set the render date
+                 */
+                scope.renderDate = scope.renderDate ? new Date(scope.renderDate) : null;
+                if (!scope.renderDate || isNaN(scope.renderDate)) {
+                    scope.renderDate = new Date();
+                }
+                scope.renderDate.setDate(1);
+                scope.month = scope.renderDate.getMonth();
+                scope.year = scope.renderDate.getFullYear();
+
+                /**
+                 * set the value
+                 */
+                scope.value = scope.value ? $filter('date')(scope.value, scope.dateformat) : null;
+
+                /**
+                 * set the bound input element
+                 */
+                scope.input = document.getElementById(scope.id);
+
+                /**
+                 * set the day cells
+                 */
+                dates = document.getElementById(scope.id + '-calendar-interface-days');
+                scope.dayCells = dates ? dates.getElementsByTagName('td') : [ ];
+
                 scope.render();
             }, 0);
-
-        },
-        html = '<table class="calendar" id="{{id}}-calendar-interface">' +
-                '<thead>' +
-                '<tr class="control">' +
-                '<th colspan="7">' +
-                '<fieldset>' +
-                '<legend>Month</legend>' +
-                '<button aria-label="{{previousMonthLabel}}" class="previous month" ng-click="prevMonth()" type="button">&lt;</button>' +
-                '<select aria-label="" class="month" ng-model="month" ng-options="months.indexOf(month) as month for month in months"></select>' +
-                '<button aria-label="{{nextMonthLabel}}" class="next month" ng-click="nextMonth()" type="button">&gt;</button>' +
-                '</fieldset>' +
-                '<fieldset>' +
-                '<legend>Year</legend>' +
-                '<button aria-label="{{previousYearLabel}}" class="previous year" ng-click="prevYear()" type="button">&lt;</button>' +
-                '<select aria-label="" class="year" ng-model="year" ng-options="(years.indexOf(year) + start_year) as year for year in years"></select>' +
-                '<button aria-label="{{nextYearLabel}}" class="next year" ng-click="nextYear()" type="button">&gt;</button>' +
-                '</fieldset>' +
-                '</th>' +
-                '</tr>' +
-                '<tr class="days" id="{{id}}-calendar-interface-day-names">' +
-                '<th scope="col"></th>' +
-                '<th scope="col"></th>' +
-                '<th scope="col"></th>' +
-                '<th scope="col"></th>' +
-                '<th scope="col"></th>' +
-                '<th scope="col"></th>' +
-                '<th scope="col"></th>' +
-                '</tr>' +
-                '</thead>' +
-                '<tbody id="{{id}}-calendar-interface-days">' +
-                '<tr>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '</tr>' +
-                '<tr>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '</tr>' +
-                '<tr>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '</tr>' +
-                '<tr>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '</tr>' +
-                '<tr>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '</tr>' +
-                '<tr>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-                '</tr>' +
-                '</tbody>' +
-                '</table>'
-            ;
+        };
 
     return {
         restrict: 'AE',
+        scope: true,
         link: link,
-        template: function(element, attrs) {
-            var e = element[0];
+        compile: function(element, attrs) {
+            var calendar = element.parent().find('calendar').length > 0;
 
-            if (e.nodeName.toLowerCase() === 'calendar') {
-                return html;
-            } else {
-                return '';
+            if (element[0].nodeName.toLowerCase() && !calendar) {
+                element[0].removeAttribute('calendar');
+                element[0].className = (element[0].className + ' calendar').replace(/^\s*|\s*$/g, '');
+                element.parent().append('<calendar bind="' + (attrs.id || element[0].id) + '" />');
             }
+            return link;
         },
-        compile: function(element) {
-            var e = element[0],
-                l = e.labels;
-
-            if (e.nodeName.toLowerCase() === 'calendar') {
-                return link;
+        template: function(el) {
+            if (el[0].nodeName.toLowerCase() !== 'calendar') {
+                return '';
             } else {
-                e = l.length ? angular.element(l.item(l.length - 1)) : null;
-                e.after(html);
-
-                return link;
+                return html;
             }
         }
     };
