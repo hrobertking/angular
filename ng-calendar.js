@@ -157,9 +157,9 @@ angular.module('prototype', [ ])
             }
 
             /**
-             * Parses a date input using the defined dateformat
+             * Parses a date input using the defined dateformat and sets the month/year for rendering
              *
-             * @returns void
+             * @returns {date}
              * @param {string} value
              */
             scope.parseDate = function(value) {
@@ -170,6 +170,16 @@ angular.module('prototype', [ ])
                     dt = { },
                     idx;
 
+                /**
+                 * make sure we have a value to parse
+                 */
+                if (!value) {
+                    return;
+                }
+
+                /**
+                 * step through the dateformat to parse the value provided
+                 */
                 for (idx = 0; idx < filter.length; idx += 1) {
                     switch (filter[idx]) {
                         case 'd':
@@ -217,20 +227,32 @@ angular.module('prototype', [ ])
                     }
                 }
 
+                /**
+                 * if we were able to separate the date parts, create a date
+                 */
                 if (dt.year > -1 && dt.month > -1 && dt.day > -1) {
                     dt = new Date(dt.year, dt.month, dt.day, dt.hours || 0, dt.minutes || 0, dt.seconds || 0, dt.milliseconds || 0);
                 }
 
+                /**
+                 * if we do not have a valid date, try to use the native parsing
+                 */
                 if (isNaN(dt)) {
                     dt = new Date(value);
                 }
 
-                if (!isNaN(dt) && dt instanceof Date) {
+                /**
+                 * if we have parsed the value into a valid date, change the rendering
+                 */
+                if (!isNaN(dt)) {
                     dt = new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000));
                     if (!isNaN(dt.getTime())) {
-                        scope.value = $filter('date')(dt, scope.dateformat);
+                        scope.month = dt.getMonth();
+                        scope.year = dt.getFullYear();
                     }
                 }
+
+                return dt;
             };
 
             /**
@@ -267,6 +289,13 @@ angular.module('prototype', [ ])
                  * and the addition/removal of the 'selected' class will have to be different
                  */
                 switch (key) {
+                    case 9: /* tab */
+                    case 16: /* shift */
+                        break;
+                    case 32: /* space */
+                        evt.preventDefault();
+                        setValue(cell);
+                        break;
                     case 37: /* left */
                         if (cell.cellIndex > 0) {
                             table.rows[row.rowIndex].cells[cell.cellIndex - 1].focus();
@@ -298,8 +327,6 @@ angular.module('prototype', [ ])
                         } else {
                             table.rows[row.rowIndex + 1].cells[cell.cellIndex].focus();
                         }
-                        break;
-                    case 9: /* tab */
                         break;
                     default:
                         setValue(cell);
@@ -340,7 +367,7 @@ angular.module('prototype', [ ])
                     scope.year -= 1;
                     scope.month = 11;
                 } else {
-                    scope.month -= -1;
+                    scope.month -= 1;
                 }
             };
 
@@ -480,14 +507,17 @@ angular.module('prototype', [ ])
              */
             function setValue(cell) {
                 var ds = cell.getAttribute('aria-label'),
-                    dt = new Date(ds);
+                    dt = new Date(ds),
+                    selected = /\bselected\b/.test(cell.className);
 
                 /**
                  * this assumes there is only one date value selected at a time
                  * if it is a range, the markup will have to be structured differently
                  * and the addition/removal of the 'selected' class will have to be different
                  */
-                if (!isNaN(dt)) {
+                if (selected) {
+                    scope.value = null;
+                } else if (!isNaN(dt)) {
                     scope.value = $filter('date')(new Date(dt.getTime() + (dt.getTimezoneOffset() * 60000)), scope.dateformat);
                 }
                 markSelected();
@@ -515,6 +545,11 @@ angular.module('prototype', [ ])
                  */
                 scope.$watch('year', setRenderDate, true);
                 scope.$watch('month', setRenderDate, true);
+
+                /**
+                 * create the monitor for the value property
+                 */
+                scope.$watch('value', scope.parseDate, true);
 
                 /**
                  * set the render date
@@ -555,17 +590,16 @@ angular.module('prototype', [ ])
             var calendar = element.parent().find('calendar').length > 0;
 
             if (element[0].nodeName.toLowerCase() && !calendar) {
-                element[0].removeAttribute('calendar');
-                element[0].className = (element[0].className + ' calendar').replace(/^\s*|\s*$/g, '');
                 element.parent().append('<calendar bind="' + (attrs.id || element[0].id) + '" />');
+                element[0].remove();
             }
             return link;
         },
-        template: function(el) {
-            if (el[0].nodeName.toLowerCase() !== 'calendar') {
+        template: function(element, attrs) {
+            if (element[0].nodeName.toLowerCase() !== 'calendar') {
                 return '';
             } else {
-                return html;
+                return '<input class="calendar" id="' + attrs.bind + '" ng-model="value" type="text" />'+html;
             }
         }
     };
