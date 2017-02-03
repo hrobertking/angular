@@ -6,15 +6,15 @@ angular.module('prototype', [ ])
                '<th colspan="7">' +
                '<fieldset>' +
                '<legend>Month</legend>' +
-               '<button aria-label="{{previousMonthLabel}}" type="button" ng-click="prevMonth()">&lt;</button>' +
+               '<button aria-label="{{previousMonthLabel}}" class="previous month" ng-click="prevMonth()" type="button">&lt;</button>' +
                '<select aria-label="" class="month" ng-model="month" ng-options="months.indexOf(month) as month for month in months"></select>' +
-               '<button aria-label="{{nextMonthLabel}}" type="button" ng-click="nextMonth()">&gt;</button>' +
+               '<button aria-label="{{nextMonthLabel}}" class="next month" ng-click="nextMonth()" type="button">&gt;</button>' +
                '</fieldset>' +
                '<fieldset>' +
                '<legend>Year</legend>' +
-               '<button aria-label="{{previousYearLabel}}" type="button" ng-click="prevYear()">&lt;</button>' +
+               '<button aria-label="{{previousYearLabel}}" class="previous year" ng-click="prevYear()" type="button">&lt;</button>' +
                '<select aria-label="" class="year" ng-model="year" ng-options="(years.indexOf(year) + start_year) as year for year in years"></select>' +
-               '<button aria-label="{{nextYearLabel}}" type="button" ng-click="nextYear()">&gt;</button>' +
+               '<button aria-label="{{nextYearLabel}}" class="next year" ng-click="nextYear()" type="button">&gt;</button>' +
                '</fieldset>' +
                '</th>' +
                '</tr>' +
