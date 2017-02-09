@@ -1,20 +1,21 @@
 angular.module('prototype', [ ])
 .directive('calendar', ['$filter', '$timeout', '$compile', function($filter, $timeout, $compile) {
-    var html = '<table class="calendar" id="{{id}}-calendar-interface">' +
+    var html = '<div class="calendar-container" ng-class="{\'hide\': !hasFocus}">' +
+               '<table class="calendar" id="{{id}}-calendar-interface">' +
                '<thead>' +
                '<tr class="control">' +
                '<th colspan="7">' +
                '<fieldset>' +
                '<legend>Month</legend>' +
-               '<button aria-label="{{previousMonthLabel}}" class="previous month" ng-click="prevMonth()" type="button">&lt;</button>' +
-               '<select aria-label="" class="month" ng-model="month" ng-options="months.indexOf(month) as month for month in months"></select>' +
-               '<button aria-label="{{nextMonthLabel}}" class="next month" ng-click="nextMonth()" type="button">&gt;</button>' +
+               '<button aria-label="{{previousMonthLabel}}" type="button" ng-click="prevMonth()" ng-focus="hasFocus=true">&lt;</button>' +
+               '<select aria-label="" class="month" ng-focus="hasFocus=true" ng-model="month" ng-options="months.indexOf(month) as month for month in months"></select>' +
+               '<button aria-label="{{nextMonthLabel}}" type="button" ng-click="nextMonth()" ng-focus="hasFocus=true">&gt;</button>' +
                '</fieldset>' +
                '<fieldset>' +
                '<legend>Year</legend>' +
-               '<button aria-label="{{previousYearLabel}}" class="previous year" ng-click="prevYear()" type="button">&lt;</button>' +
-               '<select aria-label="" class="year" ng-model="year" ng-options="(years.indexOf(year) + start_year) as year for year in years"></select>' +
-               '<button aria-label="{{nextYearLabel}}" class="next year" ng-click="nextYear()" type="button">&gt;</button>' +
+               '<button aria-label="{{previousYearLabel}}" type="button" ng-click="prevYear()" ng-focus="hasFocus=true">&lt;</button>' +
+               '<select aria-label="" class="year" ng-focus="hasFocus=true" ng-model="year" ng-options="(years.indexOf(year) + start_year) as year for year in years"></select>' +
+               '<button aria-label="{{nextYearLabel}}" type="button" ng-click="nextYear()" ng-focus="hasFocus=true">&gt;</button>' +
                '</fieldset>' +
                '</th>' +
                '</tr>' +
@@ -24,61 +25,62 @@ angular.module('prototype', [ ])
                '</thead>' +
                '<tbody id="{{id}}-calendar-interface-days">' +
                '<tr>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
                '</tr>' +
                '<tr>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
                '</tr>' +
                '<tr>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
                '</tr>' +
                '<tr>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
                '</tr>' +
                '<tr>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
                '</tr>' +
                '<tr>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
-               '<td ng-click="onclick($event);" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
+               '<td ng-blur="hasFocus=false" ng-click="onclick($event);" ng-focus="hasFocus=true" ng-keydown="onkeydown($event);" tabindex="0"></td>' +
                '</tr>' +
                '</tbody>' +
-               '</table>',
+               '</table>' +
+               '</div>',
         link = function(scope, element, attrs, ctrl) {
             var ndx;
 
@@ -99,6 +101,14 @@ angular.module('prototype', [ ])
              * @type {integer}
              */
             scope.startOn = scope.startOn || 0;
+
+            /**
+             * Whether or not the component has focus
+             *
+             * @type {boolean}
+             * @default false
+             */
+            scope.hasFocus = false;
 
             /**
              * Abbreviated day names for the column headers, e.g., 'Sun', 'Mon'
@@ -279,7 +289,9 @@ angular.module('prototype', [ ])
                     row = cell.parentNode,
                     tbody = row.parentNode,
                     table = tbody.parentNode,
-                    key = (evt || window.event).keyCode;
+                    key = (evt || window.event).keyCode,
+                    is_last_col = (cell.cellIndex === row.cells.length - 1),
+                    is_last_row = (row.rowIndex === table.rows.length - 1);
 
                 /**
                  * if the key is a directional key, move, otherwise select/unselect the date
@@ -290,6 +302,7 @@ angular.module('prototype', [ ])
                  */
                 switch (key) {
                     case 9: /* tab */
+                        break;
                     case 16: /* shift */
                         break;
                     case 32: /* space */
@@ -306,6 +319,7 @@ angular.module('prototype', [ ])
                         }
                         break;
                     case 38: /* up */
+                        evt.preventDefault();
                         if (row.sectionRowIndex === 0) {
                             table.rows[tbody.rows[tbody.rows.length - 1].rowIndex].cells[cell.cellIndex].focus();
                         } else {
@@ -313,6 +327,7 @@ angular.module('prototype', [ ])
                         }
                         break;
                     case 39: /* right */
+                        evt.preventDefault();
                         if (cell.cellIndex < 6) {
                             table.rows[row.rowIndex].cells[cell.cellIndex + 1].focus();
                         } else if (row.sectionRowIndex === tbody.rows.length - 1) {
@@ -322,6 +337,7 @@ angular.module('prototype', [ ])
                         }
                         break;
                     case 40: /* down */
+                        evt.preventDefault();
                         if (row.sectionRowIndex === tbody.rows.length - 1) {
                             table.rows[tbody.rows[0].rowIndex].cells[cell.cellIndex].focus();
                         } else {
@@ -570,7 +586,13 @@ angular.module('prototype', [ ])
                 /**
                  * set the bound input element
                  */
-                scope.input = document.getElementById(scope.id);
+                scope.input = angular.element(document.getElementById(scope.id));
+                scope.input.on('blur', function() {
+                    scope.hasFocus = false;
+                });
+                scope.input.on('focus', function() {
+                    scope.hasFocus = true;
+                });
 
                 /**
                  * set the day cells
@@ -589,9 +611,11 @@ angular.module('prototype', [ ])
         compile: function(element, attrs) {
             var calendar = element.parent().find('calendar').length > 0;
 
-            if (element[0].nodeName.toLowerCase() && !calendar) {
-                element.parent().append('<calendar bind="' + (attrs.id || element[0].id) + '" />');
-                element[0].remove();
+            if (element[0].nodeName.toLowerCase() !== 'calendar') {
+                if (!calendar) {
+                    element.parent().append('<calendar bind="' + (attrs.id || element[0].id) + '" />');
+                    element[0].remove();
+                }
             }
             return link;
         },
@@ -599,7 +623,7 @@ angular.module('prototype', [ ])
             if (element[0].nodeName.toLowerCase() !== 'calendar') {
                 return '';
             } else {
-                return '<input class="calendar" id="' + attrs.bind + '" ng-model="value" type="text" />'+html;
+                return '<input class="calendar" id="' + attrs.bind + '"  ng-focus="hasFocus=true" ng-model="value" type="text" />'+html;
             }
         }
     };
