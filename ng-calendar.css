@@ -1,0 +1,120 @@
+/*
+ * hide the text input on phablet or larger
+ */
+@media (min-width: 480px) {
+    input.calendar,
+    input[calendar] {
+        position:absolute;
+        left: -10000px;
+    }
+
+    .calendar-container:before {
+        display: none;
+    }
+
+    .calendar-container {
+        display: block !important;
+        margin-top: auto !important;
+    }
+}
+
+input.calendar,
+input[calendar] {
+    width: 98%;
+}
+
+/**
+ * the display of the calendar container
+ * needs to be governed by js because there
+ * is not parent selector in CSS, but even
+ * if the 'hide' class is present, show the
+ * calendar when the input has focus
+ */
+.calendar-container:before {
+    border-left: 0.5em solid transparent;
+    border-right: 0.5em solid transparent;
+    border-bottom: 0.5em solid black;
+    border-top: 0.5em solid transparent;
+    content: "";
+    height: 0;
+    left: 50%;
+    margin-left: -0.5em;
+    position: relative;
+    top: -1.7em;
+    width: 0;
+}
+.calendar-container {
+    border: 1px solid black;
+    border-radius: 0.5em;
+    margin: auto;
+    margin-top: 0.75em;
+}
+.calendar-container.hide {
+    display: none;
+}
+.calendar-container.hide:before {
+    display: none;
+}
+
+table.calendar {
+    border-spacing: 3px;
+    width: 100%;
+}
+table.calendar tbody tr:last-of-type td:first-of-type {
+    border-bottom-left-radius: 0.5em;
+}
+table.calendar tbody tr:last-of-type td:last-of-type {
+    border-bottom-right-radius: 0.5em;
+}
+table.calendar .control {
+    overflow: auto;
+}
+table.calendar .control th > fieldset {
+    border: none;
+    float: left;
+    margin: 0;
+    padding: 0;
+}
+table.calendar .control th > fieldset:last-of-type {
+    float: right;
+}
+table.calendar .control th button,
+table.calendar .control th select {
+    display: inline;
+    width: auto;
+}
+table.calendar .days th,
+table.calendar tbody td {
+    width: 14%;
+}
+table.calendar td {
+    border: 1px solid #000;
+    cursor: default;
+    font-size: 0.5em;
+    font-weight: bold;
+    position: relative;
+    text-align: right;
+    vertical-align: top;
+}
+table.calendar td:after {
+    content: '';
+    display: block;
+    margin-top: 75%;
+}
+table.calendar td.before,
+table.calendar td.after {
+    background-color: rgb(200, 255, 200);
+}
+table.calendar td.today {
+    background: repeating-linear-gradient(
+        -55deg,
+        #cfc,
+        #cfc 0.5em,
+        #efefef 0.5em,
+        #efefef 1em
+    )
+}
+table.calendar td.selected {
+    box-shadow: inset 0 0 1.5em gold;
+}
+
