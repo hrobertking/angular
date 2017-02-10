@@ -31,20 +31,20 @@ input[calendar] {
  * calendar when the input has focus
  */
 .calendar-container:before {
-    border-left: 0.5em solid transparent;
-    border-right: 0.5em solid transparent;
-    border-bottom: 0.5em solid black;
-    border-top: 0.5em solid transparent;
+    border-left: 0.75em solid transparent;
+    border-right: 0.75em solid transparent;
+    border-bottom: 0.75em solid #000;
+    border-top: 0.75em solid transparent;
     content: "";
     height: 0;
     left: 50%;
-    margin-left: -0.5em;
+    margin-left: -0.75em;
     position: relative;
-    top: -1.7em;
+    top: -1.85em;
     width: 0;
 }
 .calendar-container {
-    border: 1px solid black;
+    border: 0.1em solid #000;
     border-radius: 0.5em;
     margin: auto;
     margin-top: 0.75em;
@@ -82,6 +82,18 @@ table.calendar .control th button,
 table.calendar .control th select {
     display: inline;
     width: auto;
+}
+table.calendar .control button.month,
+table.calendar .control button.year,
+table.calendar .control select.month,
+table.calendar .control select.year {
+	border: 1px solid #a9a9a9;
+}
+table.calendar .control button.next {
+	border-radius: 0 0.3em 0.3em 0;
+}
+table.calendar .control button.previous {
+	border-radius: 0.3em 0 0 0.3em;
 }
 table.calendar .days th,
 table.calendar tbody td {

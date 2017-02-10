@@ -7,15 +7,15 @@ angular.module('prototype', [ ])
                '<th colspan="7">' +
                '<fieldset>' +
                '<legend>Month</legend>' +
-               '<button aria-label="{{previousMonthLabel}}" type="button" ng-click="prevMonth()" ng-focus="hasFocus=true">&lt;</button>' +
+               '<button aria-label="{{previousMonthLabel}}" class="previous month" type="button" ng-click="prevMonth()" ng-focus="hasFocus=true">&lt;</button>' +
                '<select aria-label="" class="month" ng-focus="hasFocus=true" ng-model="month" ng-options="months.indexOf(month) as month for month in months"></select>' +
-               '<button aria-label="{{nextMonthLabel}}" type="button" ng-click="nextMonth()" ng-focus="hasFocus=true">&gt;</button>' +
+               '<button aria-label="{{nextMonthLabel}}" class="next month" type="button" ng-click="nextMonth()" ng-focus="hasFocus=true">&gt;</button>' +
                '</fieldset>' +
                '<fieldset>' +
                '<legend>Year</legend>' +
-               '<button aria-label="{{previousYearLabel}}" type="button" ng-click="prevYear()" ng-focus="hasFocus=true">&lt;</button>' +
+               '<button aria-label="{{previousYearLabel}}" class="previous year" type="button" ng-click="prevYear()" ng-focus="hasFocus=true">&lt;</button>' +
                '<select aria-label="" class="year" ng-focus="hasFocus=true" ng-model="year" ng-options="(years.indexOf(year) + start_year) as year for year in years"></select>' +
-               '<button aria-label="{{nextYearLabel}}" type="button" ng-click="nextYear()" ng-focus="hasFocus=true">&gt;</button>' +
+               '<button aria-label="{{nextYearLabel}}" class="next year" type="button" ng-click="nextYear()" ng-focus="hasFocus=true">&gt;</button>' +
                '</fieldset>' +
                '</th>' +
                '</tr>' +
@@ -111,21 +111,20 @@ angular.module('prototype', [ ])
             scope.hasFocus = false;
 
             /**
+             * The ISO 639 two character language code used when rendering the calendar
+             * 
+             * @type {string}
+             */
+            scope.lang = 'en';
+
+            /**
              * Abbreviated day names for the column headers, e.g., 'Sun', 'Mon'
              * 'Fri', 'Sat'. Sunday must be the first element and Saturday the
              * last.
              *
              * @type {string[]}
              */
-            scope.days = [
-                    $filter('date')(new Date(1970, 0, 4), 'EEE'),
-                    $filter('date')(new Date(1970, 0, 5), 'EEE'),
-                    $filter('date')(new Date(1970, 0, 6), 'EEE'),
-                    $filter('date')(new Date(1970, 0, 7), 'EEE'),
-                    $filter('date')(new Date(1970, 0, 8), 'EEE'),
-                    $filter('date')(new Date(1970, 0, 9), 'EEE'),
-                    $filter('date')(new Date(1970, 0, 10), 'EEE')
-                ];
+            scope.days = [ ];
 
             /**
              * Month names for the 'months' drop down list. January is the first
@@ -134,22 +133,6 @@ angular.module('prototype', [ ])
              * @type {string[]}
              */
             scope.months = scope.months || attrs.months || [ ];
-            if (!(scope.months instanceof Array) || scope.months.length < 12) {
-                scope.months = [
-                        $filter('date')(new Date(1970, 0, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 1, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 2, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 3, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 4, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 5, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 6, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 7, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 8, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 9, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 10, 1), 'MMMM'),
-                        $filter('date')(new Date(1970, 11, 1), 'MMMM')
-                    ];
-            }
 
             /**
              * The years array for the 'years' drop down list. Defaults to the current
@@ -455,6 +438,65 @@ angular.module('prototype', [ ])
             };
 
             /**
+             * Returns an array of day names given the language
+             *
+             * @returns {string[]}
+             * @private
+             */
+            function getDayNames() {
+                var names;
+
+                switch (scope.lang) {
+                    case 'zh': /* Chinese 1 */
+                    case 'es': /* Spanish 2 */
+                    case 'hi': /* Hindi 4 */
+                    case 'ar': /* Arabic 5 */
+                    case 'pt': /* Portuguese 6 */
+                    case 'bn': /* Bengali 7 */
+                    case 'ru': /* Russian 8 */
+                    case 'jp': /* Japanese 9*/
+                    case 'pa': /* Punjabi 10 */
+                    case 'de': /* German */
+                    case 'it': /* Italian */
+                    case 'fr': /* French */
+                    default:
+                        names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                        break;
+                }
+                return names;
+            }
+
+            /**
+             * Returns an array of month names given the language
+             *
+             * @returns {void}
+             * @private
+             */
+            function getMonthNames() {
+                var names;
+
+                switch (scope.lang) {
+                    case 'zh': /* Chinese 1 */
+                    case 'es': /* Spanish 2 */
+                    case 'hi': /* Hindi 4 */
+                    case 'ar': /* Arabic 5 */
+                    case 'pt': /* Portuguese 6 */
+                    case 'bn': /* Bengali 7 */
+                    case 'ru': /* Russian 8 */
+                    case 'jp': /* Japanese 9*/
+                    case 'pa': /* Punjabi 10 */
+                    case 'de': /* German */
+                    case 'it': /* Italian */
+                    case 'fr': /* French */
+                    default:
+                        names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                        break;
+                }
+
+                scope.months = names;
+            }
+
+            /**
              * Returns true if the value provided is the value selected
              *
              * @returns {boolean}
@@ -492,6 +534,7 @@ angular.module('prototype', [ ])
              * @private
              */
             function setDayColumns() {
+                scope.days = getDayNames();
                 scope.dayColumns = [ ];
                 for (ndx = 0; ndx < scope.days.length; ndx += 1) {
                     scope.dayColumns.push(scope.days[ (ndx + (scope.startOn % 7)) < scope.days.length ?
@@ -551,10 +594,19 @@ angular.module('prototype', [ ])
                 setDayColumns();
 
                 /**
+                 * set the month names
+                 */
+                if (!(scope.months instanceof Array) || scope.months.length < 12) {
+                    getMonthNames();
+                }
+
+                /**
                  * create the monitors for localization changes
                  */
                 scope.$watch('days', setDayColumns, true);
                 scope.$watch('startOn', setDayColumns, true);
+                scope.$watch('lang', setDayColumns, true);
+                scope.$watch('lang', getMonthNames, true);
 
                 /**
                  * create the monitors for year and month rendering changes
