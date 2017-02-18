@@ -53,6 +53,7 @@ table.calendar .control {
 table.calendar .control th > fieldset {
     border: none;
     float: left;
+    font-size: 0.8em;
     margin: 0;
     padding: 0;
 }
