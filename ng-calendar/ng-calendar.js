@@ -675,7 +675,7 @@ angular.module('prototype', [ ])
             if (element[0].nodeName.toLowerCase() !== 'calendar') {
                 return '';
             } else {
-                return '<input class="calendar" id="' + attrs.bind + '" ng-focus="hasFocus=true" ng-model="value" placeholder="{{ dateformat | lowercase }}" type="text" />'+html;
+                return '<input class="ng-calendar-interface" id="' + attrs.bind + '" ng-focus="hasFocus=true" ng-model="value" placeholder="{{ dateformat | lowercase }}" type="text" />'+html;
             }
         }
     };
