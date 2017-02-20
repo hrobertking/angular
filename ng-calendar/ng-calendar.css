@@ -124,8 +124,7 @@ table.calendar td.selected {
  * hide the text input on phablet or larger
  */
 @media (min-width: 480px) {
-    input.calendar,
-    input[calendar] {
+    calendar > input.ng-calendar-interface {
         position:absolute;
         left: -10000px;
     }
