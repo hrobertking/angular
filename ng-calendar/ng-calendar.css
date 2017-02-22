@@ -20,7 +20,7 @@ input[calendar] {
     left: 50%;
     margin-left: -0.75em;
     position: relative;
-    top: -1.85em;
+    top: -2em;
     width: 0;
 }
 .calendar-container {
