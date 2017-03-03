@@ -41,12 +41,16 @@ table.calendar {
     border-spacing: 3px;
     width: 100%;
 }
-table.calendar tbody tr:last-of-type td:first-of-type {
+table.calendar > tbody tr:last-of-type td:first-of-type {
     border-bottom-left-radius: 0.5em;
 }
-table.calendar tbody tr:last-of-type td:last-of-type {
+table.calendar > tbody tr:last-of-type td:last-of-type {
     border-bottom-right-radius: 0.5em;
 }
+table.calendar > thead {
+    font-size: 0.8em;
+}
+
 table.calendar .control {
     overflow: auto;
 }
@@ -85,6 +89,7 @@ table.calendar .control button.next {
 table.calendar .control button.previous {
     border-radius: 0.3em 0 0 0.3em;
 }
+
 table.calendar .days th,
 table.calendar tbody td {
     width: 14%;
