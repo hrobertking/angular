@@ -26,6 +26,15 @@ table.calendar > thead {
 table.calendar .control {
     overflow: auto;
 }
+table.calendar .control.buttons {
+    text-align: right;
+}
+table.calendar .control.buttons > .close {
+    border: 1px solid #000;
+    border-radius: 1em;
+    background-color: transparent;
+    font-weight: bold;
+}
 table.calendar .control th > fieldset {
     border: none;
     float: left;
