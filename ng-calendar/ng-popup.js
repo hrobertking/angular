@@ -1,15 +1,15 @@
 angular.module('prototype', [ ])
 .directive('calendarPopup', ['$filter', '$timeout', '$compile', function($filter, $timeout, $compile) {
-    var larrow ='<div ng-hide="!hasFocus" style="border:1em solid transparent; border-right:1em solid #000; float:left; height:0; margin:1.2em 0 0 -1.2em; width:0;"></div>',
-        lmarrow='<div ng-hide="!hasFocus" style="border:1em solid transparent; border-right:1em solid #000; height:0; margin:1.2em 0 0 -1.2em; position:absolute; width:0;"></div>',
-        bmarrow='<div ng-hide="!hasFocus" style="border:1em solid transparent; border-bottom:1em solid #000; height:0; margin:-1.2em 0 0 1.2em; width:0;"></div>',
-        btn =   '<button class="icon" ng-click="hasFocus=!hasFocus" type="button"' +
-                ' style="background:transparent url(https://core.trac.wordpress.org/raw-attachment/ticket/27844/calendar.png) no-repeat center;background-size:cover;border:0;height:2em;margin:-0.2em 0.2em;;padding:0;text-indent:-1000em;width:2em;"' +
-                '>Show Calendar</button>',
-        html =  '<div class="calendar-container" ng-hide="!hasFocus">' + // if it's supposed to pop out of the container, use the following style: display:inline-block; float:none; margin:0 0 0 0.8em; position:absolute; width:auto; z-index: 1;
+    var arrow = '<div class="callout" ng-hide="!hasFocus"></div>',
+        btn =   '<button class="icon calendar" ng-click="hasFocus=!hasFocus" type="button">Show Calendar</button>',
+        html =  '<div class="calendar-popup-container" ng-hide="!hasFocus">' +
                 '<table class="calendar" id="{{id}}-calendar-interface">' +
                 '<thead>' +
-                '<tr class="control">' +
+                '<tr class="control buttons">' +
+                '<th colspan="7">' +
+                '<button class="close" ng-click="hasFocus=false" type="button">&times;</button>' +
+                '</tr>' +
+                '<tr class="control period">' +
                 '<th colspan="7">' +
                 '<fieldset>' +
                 '<legend>Month</legend>' +
@@ -89,9 +89,9 @@ angular.module('prototype', [ ])
                 '</div>',
         link =  function(scope, element, attrs, ctrl) {
             /**
-             * this function will need to bind the attrs.calendarPopup.day to the scope.day
-             * the attrs.calendarPopup.month to the scope.month and the
-             * attrs.calendarPopup.year to the scope.year
+             * this function will need to bind the attrs.config.day to the scope.day
+             * the attrs.config.month to the scope.month and the
+             * attrs.config.year to the scope.year
              */
 
             var ndx;
@@ -748,17 +748,17 @@ angular.module('prototype', [ ])
         scope: true,
         compile: function(element, attrs) {
             /**
-             * if we have a properly formed calendar-popup we should have a calendarPopup object
+             * if we have a properly formed calendar-popup we should have a config object
              * as part of the attrs object
              */
-            if (attrs.calendarPopup) {
+            if (attrs.config) {
                 return link;
             }
         },
         template: function(element, attrs) {
             var el,
                 ui = angular.element(html)[0],
-                style;
+                callout;
 
             /**
              * uses unnamed arguments as a list
@@ -812,13 +812,17 @@ angular.module('prototype', [ ])
                     result = { },
                     attr = (style || '').split(';'),
                     rule,
-                    ndx;
+                    ndx,
+                    prop;
 
+                result[prop] = value;
                 for (ndx = 0; ndx < attr.length; ndx += 1) {
                     rule = attr[ndx].split(':');
-                    result[rule.splice(0, 1)[0]] = rule.join(':');
+                    prop = rule.splice(0, 1)[0];
+                    if (prop) {
+                        result[prop] = rule.join(':');
+                    }
                 }
-                result[prop] = value;
 
                 style = [ ];
                 for (ndx in result) {
@@ -838,7 +842,7 @@ angular.module('prototype', [ ])
                  */
                 switch (item.getAttribute('name').toLowerCase()) {
                     case 'year':
-                        attrs.calendarPopup.year = item.getAttribute('id');
+                        attrs.config.year = item.getAttribute('id');
                         item.setAttribute('ng-model', 'yearnum');
                         if (item.nodeName.toLowerCase() === 'select' && !item.getAttribute('ng-options')) {
                             opts = angular.element(item).find('option');
@@ -854,7 +858,7 @@ angular.module('prototype', [ ])
                         }
                         break;
                     case 'month':
-                        attrs.calendarPopup.month = item.getAttribute('id');
+                        attrs.config.month = item.getAttribute('id');
                         item.setAttribute('ng-model', 'monthnum');
                         if (item.nodeName.toLowerCase() === 'select' && !item.getAttribute('ng-options')) {
                             opts = angular.element(item).find('option');
@@ -871,7 +875,7 @@ angular.module('prototype', [ ])
                         }
                         break;
                     case 'day':
-                        attrs.calendarPopup.day = item.getAttribute('id');
+                        attrs.config.day = item.getAttribute('id');
                         item.setAttribute('ng-model', 'daynum');
                         if (item.nodeName.toLowerCase() === 'select' && !item.getAttribute('ng-options')) {
                             opts = angular.element(item).find('option');
@@ -893,9 +897,13 @@ angular.module('prototype', [ ])
              * try to set the props based on an object passed in the calendar-popup attribute
              */
             try {
-                attrs.calendarPopup = JSON.parse(attrs.calendarPopup);
+                attrs.config = JSON.parse(attrs.calendarPopup
+                        .replace(/(\{|\,)\s*\'([^\']+)\'\s*\:/g, '$1"$2":')
+                        .replace(/\:\s*\'([^\']+)\'\s*(\}|\,)/g, ':"$1"$2'));
             } catch(ignore) {
-                attrs.calendarPopup = {
+                attrs.config = {
+                    modal: true,
+                    direction: 'b',
                     day: null,
                     month: null,
                     year: null
@@ -905,14 +913,14 @@ angular.module('prototype', [ ])
             /**
              * sanity check on the datepart inputs
              */
-            attrs.calendarPopup.day = (attrs.dayId && document.getElementById(attrs.dayId)) ? attrs.dayId : null;
-            attrs.calendarPopup.month = (attrs.monthId && document.getElementById(attrs.monthId)) ? attrs.monthId : null;
-            attrs.calendarPopup.year = (attrs.yearId && document.getElementById(attrs.yearId)) ? attrs.yearId : null;
+            attrs.config.day = (attrs.dayId && document.getElementById(attrs.dayId)) ? attrs.dayId : null;
+            attrs.config.month = (attrs.monthId && document.getElementById(attrs.monthId)) ? attrs.monthId : null;
+            attrs.config.year = (attrs.yearId && document.getElementById(attrs.yearId)) ? attrs.yearId : null;
 
             /**
              * validate the elements to be bound and bind them
              */
-            if (!attrs.calendarPopup.day || !attrs.calendarPopup.month || !attrs.calendarPopup.year) {
+            if (!attrs.config.day || !attrs.config.month || !attrs.config.year) {
                 angular.forEach(element.find('input'), setProps);
                 angular.forEach(element.find('select'), setProps);
             }
@@ -921,39 +929,34 @@ angular.module('prototype', [ ])
              * if we don't have the necessary elements, abort the process, otherwise build the ancestor trees
              * and figure out where to add the HTML
              */
-            if (!attrs.calendarPopup.day || !attrs.calendarPopup.month || !attrs.calendarPopup.year) {
-                delete attrs.calendarPopup;
+            if (!attrs.config.day || !attrs.config.month || !attrs.config.year) {
+                delete attrs.config;
                 element.removeAttr('calendar-popup');
             } else {
-                element.attr('calendar-popup', JSON.stringify(attrs.calendarPopup).replace(/\"/g, "'"));
+                element.attr('calendar-popup', JSON.stringify(attrs.config).replace(/\"/g, "'"));
 
                 attrs.id = attrs.id || 'ng-calendar-popup-' + (new Date()).getTime();
                 element.attr('id', attrs.id);
 
-                attrs.style = setStyle(element[0], 'overflow', 'auto');
-                element.attr('style', attrs.style);
+                element.attr('style', setStyle(element[0], 'overflow', 'auto'));
 
                 /**
                  * find the ancestor of the input interface
                  */
-                el = findAncestor(document.getElementById(attrs.calendarPopup.day),
-                        document.getElementById(attrs.calendarPopup.month),
-                        document.getElementById(attrs.calendarPopup.year));
+                el = findAncestor(document.getElementById(attrs.config.day),
+                        document.getElementById(attrs.config.month),
+                        document.getElementById(attrs.config.year));
 
                 /**
-                 * make sure float is set - if the element should not be contained (i.e. be modal-like), don't set this
+                 * add the calendar interface as a sibling of the input interface
                  */
-                el.setAttribute('style', setStyle(el, 'float', 'left'));
-                ui.setAttribute('style', setStyle(ui, 'float', 'left'));
+                callout = angular.element(arrow).addClass(attrs.config.direction);
 
-                /**
-                 * add the calendar interface as a sibling of the input interface - if the interface should be modal-like
-                 * use lmarrow or bmarrow and set the following style to override the calendar-container on the ui element
-                 * - display:inline-block; float:none; margin:0 0 0 0.8em; position:absolute; width:auto; z-index: 1; -
-                 */
+                el.setAttribute('style', setStyle(el, 'display', (attrs.config.direction === 'left') ? 'inline-block' : 'block'));
+
                 el.appendChild(angular.element(btn)[0]);
                 el.parentNode.insertBefore(ui, el.nextSibling);
-                el.parentNode.insertBefore(angular.element(larrow)[0], ui);
+                el.parentNode.insertBefore(callout[0], ui);
             }
 
             /**
