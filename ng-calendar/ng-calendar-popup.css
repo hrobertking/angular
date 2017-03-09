@@ -1,0 +1,54 @@
+.callout {
+    border: 1em solid transparent;
+    height: 0;
+    position: absolute;
+    width: 0;
+}
+.callout.bottom,
+.callout.left {
+    border-bottom: 1em solid #000;
+    display: block;
+    margin: -1.2em 0 0 1.2em;
+}
+.callout.bottom + .calendar-popup-container,
+.callout.left + .calendar-popup-container {
+    display: block;
+    margin: 0.8em 0 0 0;
+    position: absolute;
+    width: auto;
+    z-index: 1;
+}
+
+.calendar-popup-container {
+    background-color: #fff;
+    border: 0.1em solid #000;
+    border-radius: 0.5em;
+    margin: auto;
+    margin-top: 0.75em;
+}
+.calendar-popup-container.hide {
+    display: none;
+}
+.calendar-popup-container.hide:before {
+    display: none;
+}
+
+@media (min-width: 480px) {
+    /**
+     * this has to override the 'bottom' style used for mobile-first
+     */
+    .callout.left {
+        border-bottom: 1em solid transparent;
+        border-right: 1em solid #000;
+        display: inline-block;
+        margin: 1.2em 0 0 -1.2em;
+    }
+
+    .callout.left,
+    .callout.left + .calendar-popup-container {
+        display: inline-block;
+    }
+    .callout.left + .calendar-popup-container {
+        margin: 0 0 0 0.8em;
+    }
+}
