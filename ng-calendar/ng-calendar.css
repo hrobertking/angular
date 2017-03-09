@@ -29,7 +29,7 @@ table.calendar .control {
 table.calendar .control.buttons {
     text-align: right;
 }
-table.calendar .control.buttons > .close {
+table.calendar .control.buttons .close {
     border: 1px solid #000;
     border-radius: 1em;
     background-color: transparent;
