@@ -444,25 +444,14 @@ angular.module('prototype', [ ])
              * @private
              */
             function getDayNames() {
-                var names;
-
-                switch (scope.lang) {
-                    case 'zh': /* Chinese 1 */
-                    case 'es': /* Spanish 2 */
-                    case 'hi': /* Hindi 4 */
-                    case 'ar': /* Arabic 5 */
-                    case 'pt': /* Portuguese 6 */
-                    case 'bn': /* Bengali 7 */
-                    case 'ru': /* Russian 8 */
-                    case 'jp': /* Japanese 9*/
-                    case 'pa': /* Punjabi 10 */
-                    case 'de': /* German */
-                    case 'it': /* Italian */
-                    case 'fr': /* French */
-                    default:
-                        names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                        break;
+                var names = [ ];
+                
+                for (var ndx = 1; ndx < 8; ndx += 1) {
+                    names.push(
+                        (new Date(2017, 0, ndx)).toLocaleDateString(scope.lang), { weekday: 'narrow' })
+                    );
                 }
+
                 return names;
             }
 
@@ -473,24 +462,12 @@ angular.module('prototype', [ ])
              * @private
              */
             function getMonthNames() {
-                var names;
+                var names = [ ];
 
-                switch (scope.lang) {
-                    case 'zh': /* Chinese 1 */
-                    case 'es': /* Spanish 2 */
-                    case 'hi': /* Hindi 4 */
-                    case 'ar': /* Arabic 5 */
-                    case 'pt': /* Portuguese 6 */
-                    case 'bn': /* Bengali 7 */
-                    case 'ru': /* Russian 8 */
-                    case 'jp': /* Japanese 9*/
-                    case 'pa': /* Punjabi 10 */
-                    case 'de': /* German */
-                    case 'it': /* Italian */
-                    case 'fr': /* French */
-                    default:
-                        names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                        break;
+                for (var ndx = 0, ndx < 12; ndx += 1) {
+                    names.push(
+                        (new Date(2017, ndx, 1)).toLocaleDateString(scope.lang), { month: 'long' })
+                    );
                 }
 
                 scope.months = names;
