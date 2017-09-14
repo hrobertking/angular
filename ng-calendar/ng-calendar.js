@@ -448,7 +448,7 @@ angular.module('prototype', [ ])
                 
                 for (var ndx = 1; ndx < 8; ndx += 1) {
                     names.push(
-                        (new Date(2017, 0, ndx)).toLocaleDateString(scope.lang), { weekday: 'narrow' })
+                        (new Date(2017, 0, ndx)).toLocaleDateString(scope.lang, { weekday: 'narrow' })
                     );
                 }
 
@@ -466,7 +466,7 @@ angular.module('prototype', [ ])
 
                 for (var ndx = 0, ndx < 12; ndx += 1) {
                     names.push(
-                        (new Date(2017, ndx, 1)).toLocaleDateString(scope.lang), { month: 'long' })
+                        (new Date(2017, ndx, 1)).toLocaleDateString(scope.lang, { month: 'long' })
                     );
                 }
 
