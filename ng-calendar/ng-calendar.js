@@ -464,7 +464,7 @@ angular.module('prototype', [ ])
             function getMonthNames() {
                 var names = [ ];
 
-                for (var ndx = 0, ndx < 12; ndx += 1) {
+                for (var ndx = 0; ndx < 12; ndx += 1) {
                     names.push(
                         (new Date(2017, ndx, 1)).toLocaleDateString(scope.lang, { month: 'long' })
                     );
